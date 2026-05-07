@@ -1,0 +1,10 @@
+
+streamlit
+PyPDF2
+python-docx
+pytesseract
+opencv-python-headless
+scikit-learn
+nltk
+pillow
+pdf2image
