@@ -1,10 +1,9 @@
-
 streamlit
-PyPDF2
-python-docx
+pdfplumber
 pytesseract
-opencv-python-headless
-scikit-learn
-nltk
-pillow
 pdf2image
+python-docx
+scikit-learn
+plotly
+spacy
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz
