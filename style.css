@@ -1,123 +1,159 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-/* -----------------------------
-   GLOBAL THEME
-------------------------------*/
+/* =========================
+   🌌 GLOBAL THEME
+========================= */
 body {
-    background-color: #0a0f1a;
-    color: #ffffff;
+    background: linear-gradient(135deg, #0a0f1a, #0f172a);
+    color: #e5e7eb;
     font-family: 'Inter', sans-serif;
 }
 
-/* Main app container */
 .block-container {
-    padding: 2rem 2.5rem;
-    background: linear-gradient(145deg, #0a0f1a, #0f172a);
+    padding: 2rem 2.2rem;
+    perspective: 1200px;
 }
 
-/* -----------------------------
-   HEADINGS (CLEAN 3D LOOK)
-------------------------------*/
-h1, h2, h3, h4 {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
+/* =========================
+   🧠 HEADINGS (3D GLOW)
+========================= */
 h1 {
     color: #ffffff !important;
-    text-shadow: 0px 0px 12px rgba(0, 102, 255, 0.6);
+    text-shadow: 0 0 15px rgba(0,102,255,0.5);
+    transform: perspective(500px) rotateX(5deg);
 }
 
-h2 {
-    color: #e6f0ff !important;
-}
-
-h3 {
+h2, h3 {
     color: #cfe3ff !important;
 }
 
-/* -----------------------------
-   BUTTONS (3D BLUE GLOW)
-------------------------------*/
+/* =========================
+   🎴 3D GLASS CARDS
+========================= */
+div[data-testid="stVerticalBlock"] {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 16px;
+    padding: 15px;
+    margin: 12px 0;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.6),
+        0 0 15px rgba(59,130,246,0.15);
+
+    backdrop-filter: blur(10px);
+    transition: 0.3s ease;
+}
+
+div[data-testid="stVerticalBlock"]:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.7),
+        0 0 25px rgba(59,130,246,0.3);
+}
+
+/* =========================
+   🔵 BUTTONS (GLOW 3D)
+========================= */
 .stButton>button {
-    background: linear-gradient(145deg, #0b3d91, #0066ff);
+    background: linear-gradient(145deg, #1d4ed8, #3b82f6);
     color: white;
-    border-radius: 14px;
-    padding: 0.65rem 1.4rem;
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
     font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 
-        0 6px 15px rgba(0, 102, 255, 0.25),
-        inset 0 0 10px rgba(255,255,255,0.05);
-    transition: all 0.25s ease-in-out;
+
+    box-shadow: 0 6px 18px rgba(0,102,255,0.3);
+    transition: 0.3s;
 }
 
 .stButton>button:hover {
     transform: translateY(-3px);
-    box-shadow: 
-        0 10px 25px rgba(0, 102, 255, 0.35);
+    box-shadow: 0 12px 28px rgba(0,102,255,0.45);
 }
 
-/* -----------------------------
-   TEXT INPUT / TEXTAREA
-------------------------------*/
+/* =========================
+   ✍ INPUTS
+========================= */
 textarea, input {
     background-color: #0f172a !important;
     color: white !important;
-    border-radius: 10px !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
-    padding: 10px !important;
+    border-radius: 10px !important;
 }
 
 textarea:focus, input:focus {
-    border: 1px solid #0066ff !important;
-    box-shadow: 0 0 10px rgba(0, 102, 255, 0.3);
-    outline: none;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 12px rgba(59,130,246,0.4);
 }
 
-/* -----------------------------
-   FILE UPLOADER
-------------------------------*/
-.stFileUploader {
-    background-color: #0f172a;
-    border: 1px dashed rgba(255,255,255,0.2);
+/* =========================
+   📊 METRICS FLOATING
+========================= */
+[data-testid="stMetric"] {
+    background: rgba(15,23,42,0.7);
     border-radius: 12px;
     padding: 10px;
+    border: 1px solid rgba(59,130,246,0.15);
+    transition: 0.3s;
 }
 
-/* -----------------------------
-   CARD STYLE (RESULT BOXES)
-------------------------------*/
-div[data-testid="stVerticalBlock"] {
-    background: linear-gradient(145deg, #0f172a, #0a0f1a);
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.4),
-        inset 0 0 10px rgba(0, 102, 255, 0.05);
-    border: 1px solid rgba(255,255,255,0.06);
+[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
 }
 
-/* -----------------------------
-   SIDEBAR (IF USED)
-------------------------------*/
+/* =========================
+   📈 PROGRESS BAR BLUE
+========================= */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+}
+
+/* =========================
+   🧊 SIDEBAR
+========================= */
 section[data-testid="stSidebar"] {
-    background-color: #0a0f1a;
+    background: #0a0f1a;
     border-right: 1px solid rgba(255,255,255,0.08);
 }
 
-/* -----------------------------
-   SCROLLBAR (BLUE ACCENT)
-------------------------------*/
+/* =========================
+   🌌 SCROLLBAR
+========================= */
 ::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #0a0f1a;
+    width: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #0066ff;
+    background: #3b82f6;
     border-radius: 10px;
+}
+ /* =========================
+   📌 IMPROVED TEXT READABILITY
+========================= */
+
+.stMarkdown p {
+    color: #cbd5e1 !important;
+    font-weight: 500;
+}
+
+/* Subtitles (your AI system line) */
+.stMarkdown h3 {
+    color: #f1f5f9 !important;
+    font-weight: 600;
+}
+
+/* Labels like Job Description / Upload */
+label, .stTextInput label, .stTextArea label {
+    color: #e2e8f0 !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Small helper text */
+.stMarkdown {
+    color: #d1d5db !important;
+}
+.js-plotly-plot {
+    border-radius: 18px;
+    overflow: hidden;
 }
