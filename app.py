@@ -2,257 +2,234 @@ import streamlit as st
 import pdfplumber
 import pytesseract
 from pdf2image import convert_from_path
-from docx import Document
 import os
 import re
 import uuid
-
-import spacy
-import numpy as np
-import pandas as pd
+import plotly.graph_objects as go
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from skills_db import skills_db
+# ✅ ADD FUNCTION HERE
+def detect_role(job_description):
+    ...
+st.set_page_config(layout="wide")
+def detect_role(job_description):
+    jd = job_description.lower()
 
-import plotly.graph_objects as go
+    if "python" in jd or "django" in jd or "flask" in jd:
+        return "Python Developer"
+    elif "data" in jd or "machine learning" in jd:
+        return "Data Scientist"
+    elif "hr" in jd or "recruitment" in jd:
+        return "HR"
+    elif "it" in jd or "support" in jd or "network" in jd or "system" in jd or "administrator" in jd:
+        return "IT"
+    else:
+        return "General"
 
-# -----------------------------
-# CONFIG
-# -----------------------------
-st.set_page_config(
-    page_title="Smart ATS AI Dashboard",
-    layout="wide"
-)
-
-st.markdown("""
-<style>
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-</style>
-""", unsafe_allow_html=True)
-st.title("🤖 Smart ATS AI Dashboard")
-st.markdown("AI-powered Resume Ranking + Skill Intelligence System")
-
-nlp = spacy.load("en_core_web_sm")
-
-
-# -----------------------------
+# =========================
 # CSS LOAD
-# -----------------------------
-def load_css(file):
-    try:
-        with open(file) as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except:
-        pass
+# =========================
+def load_css():
+    with open("style.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-load_css("style.css")
+load_css()
 
-# -----------------------------
-# CLEAN TEXT
-# -----------------------------
+# =========================
+# TEXT CLEANING
+# =========================
 def clean_text(text):
-    return re.sub(r"\s+", " ", text).lower()
+    text = text.lower()
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+    return text
 
-# -----------------------------
-# SKILL EXTRACTION
-# -----------------------------
-def extract_skills(text):
-    all_skills = []
-    for cat in skills_db.values():
-        all_skills.extend(cat)
 
-    return list(set([s for s in all_skills if s.lower() in text.lower()]))
-
-# -----------------------------
-# ROLE DETECTION
-# -----------------------------
-def detect_role(skills):
-    scores = {}
-    for role, role_skills in skills_db.items():
-        scores[role] = len(set(skills) & set(role_skills))
-    return max(scores, key=scores.get)
-
-# -----------------------------
-# TEXT EXTRACTION
-# -----------------------------
-def extract_text(file_path, file_type):
+# =========================
+# PDF TEXT EXTRACTION
+# =========================
+def extract_text_from_pdf(file_path):
     text = ""
 
-    if file_type == "pdf":
-        try:
-            with pdfplumber.open(file_path) as pdf:
-                for p in pdf.pages:
-                    if p.extract_text():
-                        text += p.extract_text()
-        except:
-            pass
+    try:
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + " "
+    except:
+        text = ""
 
-        if len(text) < 50:
-            try:
-                images = convert_from_path(file_path)
-                for img in images:
-                    text += pytesseract.image_to_string(img)
-            except:
-                pass
-
-    elif file_type == "docx":
-        doc = Document(file_path)
-        for p in doc.paragraphs:
-            text += p.text + " "
-
-    elif file_type in ["png", "jpg", "jpeg"]:
-        text = pytesseract.image_to_string(file_path)
+    if len(text.strip()) == 0:
+        images = convert_from_path(file_path)
+        for img in images:
+            text += pytesseract.image_to_string(img)
 
     return clean_text(text)
 
-# -----------------------------
-# SCORE ENGINE (FIXED)
-# -----------------------------
-def calculate_score(resume_text, job_text, skill_w, sem_w):
 
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf = vectorizer.fit_transform([resume_text, job_text])
+# =========================
+# UI
+# =========================
+st.title("🎫 Smart ATS AI DASHBOARD")
+st.markdown(
+    "<h3 style='color:#cbd5e1;'>AI-Based Resume Screening, Skill Matching & Candidate Ranking System</h3>",
+    unsafe_allow_html=True
+)
 
-    semantic = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0] * 100
-
-    resume_skills = extract_skills(resume_text)
-    job_skills = extract_skills(job_text)
-
-    matched = list(set(resume_skills) & set(job_skills))
-    missing = list(set(job_skills) - set(resume_skills))
-
-    skill_score = (len(matched) / len(job_skills)) * 100 if job_skills else 0
-
-    final = (skill_score * skill_w) + (semantic * sem_w)
-
-    final = max(0, min(final, 100))
-
-    return int(round(final)), matched, missing, int(round(skill_score)), int(round(semantic))
-
-# -----------------------------
-# GAUGE (3D STYLE)
-# -----------------------------
-def gauge(score, name):
-
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=int(score),
-
-        number={'suffix': "%", 'font': {'size': 38, 'color': "white"}},
-
-        title={'text': name, 'font': {'color': "#dbeafe"}},
-
-        gauge={
-            'axis': {'range': [0, 100], 'visible': False},
-
-            'bar': {'color': "#60a5fa", 'thickness': 0.25},
-
-            'bgcolor': "rgba(255,255,255,0.03)",
-
-            'steps': [
-                {'range': [0, 40], 'color': "rgba(239,68,68,0.5)"},
-                {'range': [40, 70], 'color': "rgba(245,158,11,0.5)"},
-                {'range': [70, 100], 'color': "rgba(34,197,94,0.5)"}
-            ],
-
-            'borderwidth': 2,
-            'bordercolor': "rgba(255,255,255,0.08)"
-        }
-    ))
-
-    fig.update_layout(
-        paper_bgcolor="rgba(15,23,42,0.7)",
-        height=280,
-        margin=dict(l=20, r=20, t=50, b=20),
-        font={'color': "white"}
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-# -----------------------------
-# SIDEBAR
-# -----------------------------
-st.sidebar.header("⚙ ATS Controls")
-
-skill_w = st.sidebar.slider("Skill Importance", 0.0, 1.0, 0.5)
-sem_w = st.sidebar.slider("Semantic Importance", 0.0, 1.0, 0.5)
-
-# -----------------------------
-# INPUTS
-# -----------------------------
-job_desc = st.text_area("📌 Job Description", height=200)
-
-files = st.file_uploader(
-    "📂 Upload Resumes",
-    type=["pdf", "docx", "png", "jpg", "jpeg"],
+job_description = st.text_area("Enter Job Description")
+uploaded_files = st.file_uploader(
+    "Upload Resume PDFs",
+    type=["pdf"],
     accept_multiple_files=True
 )
 
-# -----------------------------
-# MAIN
-# -----------------------------
-if st.button("🚀 Run Smart ATS AI"):
+run = st.button("Run SMART ATS AI")
 
-    if files and job_desc:
-
-        results = []
-
-        for f in files:
-
-            ext = f.name.split(".")[-1]
-            path = f"temp_{uuid.uuid4().hex}.{ext}"
-
-            with open(path, "wb") as file:
-                file.write(f.read())
-
-            text = extract_text(path, ext)
-
-            score, matched, missing, skill_s, sem_s = calculate_score(
-                text, job_desc, skill_w, sem_w
-            )
-
-            role = detect_role(matched)
-
-            results.append({
-                "name": f.name,
-                "score": score,
-                "matched": matched,
-                "missing": missing,
-                "role": role
-            })
-
-            os.remove(path)
-
-        results = sorted(results, key=lambda x: x["score"], reverse=True)
-
-        st.subheader("🏆 Ranking Dashboard")
-
-        # -----------------------------
-        # CARDS UI
-        # -----------------------------
-        for i, r in enumerate(results):
-
-            st.markdown(f"""
-            <div class="card">
-                <h3>#{i+1} {r['name']}</h3>
-                <h2>{r['score']}%</h2>
-                <p><b>Role:</b> {r['role']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.success("Matched Skills: " + ", ".join(r["matched"]))
-
-            with col2:
-                st.error("Missing Skills: " + ", ".join(r["missing"]))
-
-            gauge(r["score"], r["name"])
+# =========================
+# MAIN LOGIC
+# =========================
+if run:
+    role = detect_role(job_description)
+    if not uploaded_files or job_description.strip() == "":
+        st.warning("Please upload file and enter job description")
 
     else:
-        st.warning("Upload resumes + job description first")
+
+        st.info("Processing...")
+
+        for uploaded_file in uploaded_files:
+
+            file_path = os.path.join(
+                "temp_" + str(uuid.uuid4()) + ".pdf"
+            )
+
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.read())
+
+            resume_text = extract_text_from_pdf(file_path)
+
+            resume_lower = resume_text.lower()
+            job_desc_lower = job_description.lower()
+
+            # =========================
+            # TF-IDF SEMANTIC SCORE
+            # =========================
+            vectorizer = TfidfVectorizer(
+                stop_words="english",
+                ngram_range=(1, 2)
+            )
+
+            tfidf_matrix = vectorizer.fit_transform(
+                [resume_text, job_description]
+            )
+
+            cosine_score = cosine_similarity(
+                tfidf_matrix[0],
+                tfidf_matrix[1]
+            )[0][0]
+
+            tfidf_score = cosine_score * 100
+
+            # =========================
+            # SKILL MATCHING
+            # =========================
+            required_skills = [
+                skill for skill in skills_db
+                if skill.lower() in job_desc_lower
+            ]
+
+            matched_skills_real = [
+                skill for skill in required_skills
+                if skill.lower() in resume_lower
+            ]
+
+            matched_skills = [
+                skill for skill in skills_db
+                if skill.lower() in resume_lower
+            ]
+
+            missing_skills = [
+                skill for skill in skills_db
+                if skill.lower() not in resume_lower
+            ]
+
+            # =========================
+            # SKILL SCORE
+            # =========================
+            if len(required_skills) > 0:
+                skill_score = (
+                    len(matched_skills_real) / len(required_skills)
+                ) * 100
+            else:
+                skill_score = 0
+
+            skill_score = min(skill_score, 100)
+
+            # =========================
+            # FINAL SCORE
+            # =========================
+            final_score = (
+                0.7 * skill_score
+            ) + (
+                0.3 * tfidf_score
+            )
+
+            final_score = int(round(final_score))
+
+            # =========================
+            # GAUGE
+            # =========================
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=final_score,
+                number={"suffix": "%"},
+                gauge={
+                    "axis": {"range": [0, 100]},
+                    "bar": {"color": "#3b82f6"},
+                    "steps": [
+                        {"range": [0, 40], "color": "#ef4444"},
+                        {"range": [40, 70], "color": "#f59e0b"},
+                        {"range": [70, 100], "color": "#22c55e"}
+                    ]
+                }
+            ))
+
+            fig.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                font={"color": "white"}
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+
+            # =========================
+            # DASHBOARD
+            # =========================
+            st.subheader("🏆 Ranking Dashboard")
+
+            role = detect_role(job_description)
+            st.markdown(
+                f"""
+                <div class="card">
+                    <h2>ATS Score: {final_score}%</h2>
+                    <h3>Role: {role}</h3>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # =========================
+            # SKILLS UI
+            # =========================
+            st.markdown("## ✅ Matched Skills")
+
+            for skill in matched_skills[:8]:
+                st.markdown(f"<div style='color:#22c55e;font-weight:bold'>✔ {skill}</div>", unsafe_allow_html=True)
+
+            st.markdown("## ❌ Missing Skills")
+
+            for skill in missing_skills[:8]:
+                st.markdown(f"<div style='color:#ef4444;font-weight:bold'>✘ {skill}</div>", unsafe_allow_html=True)
