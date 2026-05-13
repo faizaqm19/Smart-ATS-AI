@@ -1,74 +1,93 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 /* =========================
-   🌌 GLOBAL THEME
+   🌌 BACKGROUND (FORCED DARK BLUE)
 ========================= */
-body {
-    background: linear-gradient(135deg, #0a0f1a, #0f172a);
-    color: #e5e7eb;
+.stApp {
+    background: radial-gradient(circle at top, #111827, #0a0f1a) !important;
+}
+html, body {
+    background: radial-gradient(circle at top, #111827, #0a0f1a) !important;
+    color: #e5e7eb !important;
     font-family: 'Inter', sans-serif;
 }
 
-.block-container {
-    padding: 2rem 2.2rem;
-    perspective: 1200px;
+/* =========================
+   📌 FULL WIDTH
+========================= */
+.main .block-container {
+    max-width: 100% !important;
+    padding: 2rem;
 }
 
 /* =========================
-   🧠 HEADINGS (3D GLOW)
+   🧠 HEADINGS (GLOW RESTORED)
 ========================= */
 h1 {
     color: #ffffff !important;
-    text-shadow: 0 0 15px rgba(0,102,255,0.5);
-    transform: perspective(500px) rotateX(5deg);
-}
-
-h2, h3 {
-    color: #cfe3ff !important;
-}
-
-/* =========================
-   🎴 3D GLASS CARDS
-========================= */
-div[data-testid="stVerticalBlock"] {
-    background: rgba(15, 23, 42, 0.75);
-    border: 1px solid rgba(59,130,246,0.2);
-    border-radius: 16px;
-    padding: 15px;
-    margin: 12px 0;
-
-    box-shadow:
-        0 10px 25px rgba(0,0,0,0.6),
-        0 0 15px rgba(59,130,246,0.15);
-
-    backdrop-filter: blur(10px);
-    transition: 0.3s ease;
-}
-
-div[data-testid="stVerticalBlock"]:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow:
-        0 18px 40px rgba(0,0,0,0.7),
+    text-shadow:
+        0 0 10px rgba(59,130,246,0.7),
         0 0 25px rgba(59,130,246,0.3);
 }
 
+h2, h3 {
+    color: #ffffff !important;
+    font-weight: 700;
+}
 /* =========================
-   🔵 BUTTONS (GLOW 3D)
+   📌 TEXT READABILITY
 ========================= */
-.stButton>button {
-    background: linear-gradient(145deg, #1d4ed8, #3b82f6);
-    color: white;
-    border-radius: 12px;
-    padding: 0.6rem 1.2rem;
-    font-weight: 600;
-
-    box-shadow: 0 6px 18px rgba(0,102,255,0.3);
-    transition: 0.3s;
+p, label, span {
+    color: #e5e7eb !important;
 }
 
-.stButton>button:hover {
+/* =========================
+   🎴 REAL 3D GLASS CARDS (SAFE)
+========================= */
+.card {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 18px;
+    padding: 16px;
+    margin: 12px 0;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.6),
+        0 0 20px rgba(59,130,246,0.15);
+
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.7),
+        0 0 30px rgba(59,130,246,0.3);
+}
+
+/* =========================
+   🔵 BUTTON (SAFE BUT 3D)
+========================= */
+.stButton > button {
+    background: linear-gradient(145deg, #1d4ed8, #3b82f6) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-weight: 600 !important;
+    border: none !important;
+
+    box-shadow:
+        0 6px 18px rgba(0,102,255,0.4),
+        inset 0 0 10px rgba(255,255,255,0.1);
+
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0,102,255,0.45);
+    box-shadow:
+        0 12px 30px rgba(0,102,255,0.5);
 }
 
 /* =========================
@@ -77,32 +96,22 @@ div[data-testid="stVerticalBlock"]:hover {
 textarea, input {
     background-color: #0f172a !important;
     color: white !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
     border-radius: 10px !important;
 }
 
-textarea:focus, input:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 12px rgba(59,130,246,0.4);
-}
-
 /* =========================
-   📊 METRICS FLOATING
+   📊 METRICS
 ========================= */
 [data-testid="stMetric"] {
-    background: rgba(15,23,42,0.7);
-    border-radius: 12px;
+    background: rgba(17,24,39,0.6);
+    border-radius: 14px;
     padding: 10px;
-    border: 1px solid rgba(59,130,246,0.15);
-    transition: 0.3s;
-}
-
-[data-testid="stMetric"]:hover {
-    transform: translateY(-3px);
+    border: 1px solid rgba(59,130,246,0.2);
 }
 
 /* =========================
-   📈 PROGRESS BAR BLUE
+   📈 PROGRESS BAR
 ========================= */
 .stProgress > div > div > div {
     background: linear-gradient(90deg, #1d4ed8, #3b82f6);
@@ -127,33 +136,32 @@ section[data-testid="stSidebar"] {
     background: #3b82f6;
     border-radius: 10px;
 }
- /* =========================
-   📌 IMPROVED TEXT READABILITY
-========================= */
-
-.stMarkdown p {
-    color: #cbd5e1 !important;
-    font-weight: 500;
+[data-testid="stFileUploader"] {
+    background: rgba(17, 24, 39, 0.7) !important;
+    border: 1px solid rgba(59,130,246,0.3) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    box-shadow: 0 0 25px rgba(59,130,246,0.15);
+    backdrop-filter: blur(10px);
 }
 
-/* Subtitles (your AI system line) */
-.stMarkdown h3 {
-    color: #f1f5f9 !important;
-    font-weight: 600;
-}
-
-/* Labels like Job Description / Upload */
-label, .stTextInput label, .stTextArea label {
-    color: #e2e8f0 !important;
-    font-weight: 600;
+/* Label text */
+[data-testid="stFileUploader"] label {
+    color: #ffffff !important;
+    font-weight: 700 !important;
     font-size: 14px;
+    letter-spacing: 0.5px;
 }
 
-/* Small helper text */
-.stMarkdown {
-    color: #d1d5db !important;
+/* Drag & drop text */
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] div {
+    color: #cbd5e1 !important;
 }
-.js-plotly-plot {
-    border-radius: 18px;
-    overflow: hidden;
+
+/* Hover effect (premium feel) */
+[data-testid="stFileUploader"]:hover {
+    transform: scale(1.01);
+    transition: 0.3s ease;
+    box-shadow: 0 0 35px rgba(59,130,246,0.25);
 }
